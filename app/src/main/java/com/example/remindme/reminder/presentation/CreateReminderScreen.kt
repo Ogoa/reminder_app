@@ -1,6 +1,7 @@
 package com.example.remindme.reminder.presentation
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -68,88 +69,88 @@ fun CreateReminderScreen(
     val MAX_CHAR_COUNT = 50
 
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(dimensionResource(id = R.dimen.small_padding))
-    ) {
-        OutlinedTextField(
-            value = newTaskState.title,
-            onValueChange = { newReminderViewModel.updateTitle(it) },
-            textStyle = MaterialTheme.typography.bodyMedium,
-            label = {
-                Text(
-                    text = stringResource(id = R.string.task_title),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = newTaskState.description,
-            onValueChange = { newReminderViewModel.updateDescription(it) },
-            textStyle = MaterialTheme.typography.bodyMedium,
-            label = {
-                Text(
-                    text = stringResource(id = R.string.task_description),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.extra_small_padding)))
-        Column {
-            CreateReminderDueTimeItem(
-                text = formattedDate,
-                buttonLabel = R.string.date_button_label,
-                onClickButton = {
-                    dateDialogState.show()
-                }
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(id = R.dimen.small_padding))
+        ) {
+            OutlinedTextField(
+                value = newTaskState.title,
+                onValueChange = { newReminderViewModel.updateTitle(it) },
+                textStyle = MaterialTheme.typography.bodyMedium,
+                label = {
+                    Text(
+                        text = stringResource(id = R.string.task_title),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = newTaskState.description,
+                onValueChange = { newReminderViewModel.updateDescription(it) },
+                textStyle = MaterialTheme.typography.bodyMedium,
+                label = {
+                    Text(
+                        text = stringResource(id = R.string.task_description),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.extra_small_padding)))
-            CreateReminderDueTimeItem(
-                text = formattedTime,
-                buttonLabel = R.string.time_button_label,
-                onClickButton = {
-                    timeDialogState.show()
-                }
-            )
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            TextButton(
-                onClick = {
-                      navController.navigate(RemindMeScreens.HomeScreen.name)
-                },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(text = stringResource(id = R.string.cancel_button))
+            Column {
+                CreateReminderDueTimeItem(
+                    text = formattedDate,
+                    buttonLabel = R.string.date_button_label,
+                    onClickButton = {
+                        dateDialogState.show()
+                    }
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.extra_small_padding)))
+                CreateReminderDueTimeItem(
+                    text = formattedTime,
+                    buttonLabel = R.string.time_button_label,
+                    onClickButton = {
+                        timeDialogState.show()
+                    }
+                )
             }
-            TextButton(
-                onClick = {
-                    val newReminder = ReminderState(
-                      title = newTaskState.title,
-                      description = newTaskState.description,
-                      dueDate = newTaskState.dueDate,
-                      dueTime = newTaskState.dueTime
-                    )
-                    newReminderViewModel.saveNewReminder(newReminder, navController)
-                    navController.navigate(RemindMeScreens.HomeScreen.name)
-                },
-                enabled = newTaskState.title.isNotEmpty() && newTaskState.description.isNotEmpty(),
-                modifier = Modifier.weight(1f)
+            Spacer(modifier = Modifier.weight(1f))
+            Row(
+                modifier = Modifier.fillMaxWidth()
             ) {
+                TextButton(
                     onClick = {
                         navController.popBackStack(
                             route = RemindMeScreens.HomeScreen.name,
                             inclusive = false
                         )
                     },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(text = stringResource(id = R.string.cancel_button))
+                }
+                TextButton(
+                    onClick = {
+                        val newReminder = ReminderState(
+                            title = newTaskState.title,
+                            description = newTaskState.description,
+                            dueDate = newTaskState.dueDate,
+                            dueTime = newTaskState.dueTime
+                        )
+                        newReminderViewModel.saveNewReminder(newReminder, navController)
+                        navController.navigate(RemindMeScreens.HomeScreen.name)
+                    },
+                    enabled = newTaskState.title.isNotEmpty() && newTaskState.description.isNotEmpty(),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(text = stringResource(R.string.save_button))
+                }
             }
         }
-        if(newReminderViewModel.isSaving) {
+        if (newReminderViewModel.isSaving) {
             CircularProgressIndicator()
         }
     }
