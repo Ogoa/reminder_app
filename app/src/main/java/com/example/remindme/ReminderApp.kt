@@ -59,13 +59,15 @@ fun RemindMeApp() {
     Scaffold(
         topBar = { RemindMeAppTopBar(currentScreen) },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate(RemindMeScreens.Create.name) }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = null
-                )
+            if(currentScreen == RemindMeScreens.HomeScreen) {
+                FloatingActionButton(
+                    onClick = { navController.navigate(RemindMeScreens.Create.name) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = null
+                    )
+                }
             }
         }
     ) {
