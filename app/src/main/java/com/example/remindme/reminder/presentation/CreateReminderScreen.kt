@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -24,8 +25,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.remindme.R
+import com.example.remindme.RemindMeScreens
 import com.example.remindme.reminder.data.NewReminderViewModel
+import com.example.remindme.reminder.data.ReminderState
 import com.example.remindme.ui.theme.RemindMeTheme
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -38,6 +42,7 @@ import java.time.format.DateTimeFormatter
  */
 @Composable
 fun CreateReminderScreen(
+    navController: NavController,
     newReminderViewModel: NewReminderViewModel = viewModel()
 ) {
     val newTaskState by  newReminderViewModel.reminderState.collectAsState()
@@ -118,19 +123,32 @@ fun CreateReminderScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             TextButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                      navController.navigate(RemindMeScreens.HomeScreen.name)
+                },
                 modifier = Modifier.weight(1f)
             ) {
                 Text(text = stringResource(id = R.string.cancel_button))
             }
             TextButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    val newReminder = ReminderState(
+                      title = newTaskState.title,
+                      description = newTaskState.description,
+                      dueDate = newTaskState.dueDate,
+                      dueTime = newTaskState.dueTime
+                    )
+                    newReminderViewModel.saveNewReminder(newReminder)
+                },
                 enabled = newTaskState.title.isNotEmpty() && newTaskState.description.isNotEmpty(),
                 modifier = Modifier.weight(1f)
             ) {
                 Text(text = stringResource(R.string.save_button))
             }
         }
+        /*if(newReminderViewModel.isSaving) {
+            CircularProgressIndicator()
+        }*/
     }
 
     // Define MaterialDialog for date picker
@@ -219,10 +237,10 @@ fun CreateReminderDueTimeItem(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun CreateReminderScreenPreview() {
-    RemindMeTheme {
-        CreateReminderScreen()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun CreateReminderScreenPreview() {
+//    RemindMeTheme {
+//        CreateReminderScreen()
+//    }
+//}
