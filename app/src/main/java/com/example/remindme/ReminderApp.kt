@@ -1,8 +1,8 @@
 package com.example.remindme
 
+import android.app.Application
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -14,7 +14,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
@@ -22,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.remindme.reminder.data.NewReminderViewModel
 import com.example.remindme.reminder.presentation.CreateReminderScreen
 import com.example.remindme.reminder.presentation.SavedRemindersScreen
 import com.example.remindme.ui.theme.RemindMeTheme
@@ -47,6 +50,11 @@ fun RemindMeApp() {
     val currentScreen = RemindMeScreens.valueOf(
         backStackEntry?.destination?.route ?: RemindMeScreens.HomeScreen.name
     )
+
+    val context = LocalContext.current.applicationContext
+    val newReminderViewModel = remember {
+        NewReminderViewModel(context as Application)
+    }
 
     Scaffold(
         topBar = { RemindMeAppTopBar(currentScreen) },
@@ -74,7 +82,10 @@ fun RemindMeApp() {
             }
 
             composable(route = RemindMeScreens.Create.name) {
-                CreateReminderScreen(navController = navController)
+                CreateReminderScreen(
+                    navController = navController,
+                    newReminderViewModel = newReminderViewModel
+                )
             }
         }
     }

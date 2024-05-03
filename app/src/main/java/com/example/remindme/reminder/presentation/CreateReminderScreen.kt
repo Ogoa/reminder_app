@@ -23,14 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.remindme.R
 import com.example.remindme.RemindMeScreens
 import com.example.remindme.reminder.data.NewReminderViewModel
 import com.example.remindme.reminder.data.ReminderState
-import com.example.remindme.ui.theme.RemindMeTheme
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
@@ -42,8 +39,8 @@ import java.time.format.DateTimeFormatter
  */
 @Composable
 fun CreateReminderScreen(
-    navController: NavController,
-    newReminderViewModel: NewReminderViewModel = viewModel()
+    navController: NavHostController,
+    newReminderViewModel: NewReminderViewModel
 ) {
     val newTaskState by  newReminderViewModel.reminderState.collectAsState()
 
@@ -138,7 +135,8 @@ fun CreateReminderScreen(
                       dueDate = newTaskState.dueDate,
                       dueTime = newTaskState.dueTime
                     )
-                    newReminderViewModel.saveNewReminder(newReminder)
+                    newReminderViewModel.saveNewReminder(newReminder, navController)
+                    navController.navigate(RemindMeScreens.HomeScreen.name)
                 },
                 enabled = newTaskState.title.isNotEmpty() && newTaskState.description.isNotEmpty(),
                 modifier = Modifier.weight(1f)
@@ -146,9 +144,9 @@ fun CreateReminderScreen(
                 Text(text = stringResource(R.string.save_button))
             }
         }
-        /*if(newReminderViewModel.isSaving) {
+        if(newReminderViewModel.isSaving) {
             CircularProgressIndicator()
-        }*/
+        }
     }
 
     // Define MaterialDialog for date picker
@@ -161,7 +159,7 @@ fun CreateReminderScreen(
                 Toast.makeText(
                     context,
                     "Date saved",
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
             negativeButton(
@@ -188,7 +186,7 @@ fun CreateReminderScreen(
                 Toast.makeText(
                     context,
                     "Time saved",
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
             negativeButton(

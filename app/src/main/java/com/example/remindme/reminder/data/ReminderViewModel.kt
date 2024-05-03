@@ -3,28 +3,26 @@ package com.example.remindme.reminder.data
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
+import com.example.remindme.RemindMeScreens
 import com.example.remindme.reminder.presentation.CreateReminderScreen
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 private const val TAG = "ReminderViewModel"
 
@@ -35,7 +33,7 @@ private const val TAG = "ReminderViewModel"
 class NewReminderViewModel(application: Application): ViewModel() {
     private val _reminderState = MutableStateFlow(ReminderState())
     val reminderState: StateFlow<ReminderState> = _reminderState.asStateFlow()
-    val appContext = application.applicationContext
+    private val appContext = application.applicationContext
 
     var isSaving by mutableStateOf(false)
         private set
@@ -46,28 +44,33 @@ class NewReminderViewModel(application: Application): ViewModel() {
     /**
      * Saves the reminder in firestore
      */
-    fun saveNewReminder(reminder: ReminderState) = viewModelScope.launch(Dispatchers.IO) {
+    fun saveNewReminder(reminder: ReminderState, navController: NavHostController) = viewModelScope.launch(Dispatchers.IO) {
         isSaving = true
-        remindersCollection
-            .add(reminder)
-            .addOnSuccessListener {
-                // Launch on the Main thread to display a Toast message
-                viewModelScope.launch(Dispatchers.Main) {
-                    Toast.makeText(
-                        appContext,
-                        "Successfully saved the reminder",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    isSaving = false
-                }
-                Log.d(TAG, "Successfully saved reminder")
-                // Reset the viewModel after saving the previously created reminder
-                resetReminder()
-            }
-            .addOnFailureListener {
-                Log.d(TAG, "${it.message}")
+        try {
+            remindersCollection.add(reminder).await()
+            // Launch on the Main thread to display a Toast message
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    appContext,
+                    "Successfully saved the reminder",
+                    Toast.LENGTH_LONG
+                ).show()
                 isSaving = false
+                delay(2000)
+                navController.navigate(RemindMeScreens.HomeScreen.name)
             }
+            Log.d(TAG, "Successfully saved reminder")
+            // Reset the viewModel after saving the previously created reminder
+            resetReminder()
+        } catch(e: Exception) {
+            Log.d(TAG, "${e.message}")
+            Toast.makeText(
+                appContext,
+                "Failed to save the reminder",
+                Toast.LENGTH_LONG
+            ).show()
+            isSaving = false
+        }
     }
 
     init {
