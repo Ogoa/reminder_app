@@ -57,7 +57,10 @@ class NewReminderViewModel(application: Application): ViewModel() {
                 ).show()
                 isSaving = false
                 delay(2000)
-                navController.navigate(RemindMeScreens.HomeScreen.name)
+                navController.popBackStack(
+                    route = RemindMeScreens.HomeScreen.name,
+                    inclusive = false
+                )
             }
             Log.d(TAG, "Successfully saved reminder")
             // Reset the viewModel after saving the previously created reminder

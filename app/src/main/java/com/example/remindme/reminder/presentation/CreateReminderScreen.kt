@@ -141,7 +141,12 @@ fun CreateReminderScreen(
                 enabled = newTaskState.title.isNotEmpty() && newTaskState.description.isNotEmpty(),
                 modifier = Modifier.weight(1f)
             ) {
-                Text(text = stringResource(R.string.save_button))
+                    onClick = {
+                        navController.popBackStack(
+                            route = RemindMeScreens.HomeScreen.name,
+                            inclusive = false
+                        )
+                    },
             }
         }
         if(newReminderViewModel.isSaving) {
