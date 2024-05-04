@@ -19,7 +19,56 @@ data class ReminderState(
     val dueTime: LocalTime = LocalTime.now(),
     val dueDate: LocalDate = LocalDate.now(),
     val isCompleted: Boolean = false
-)
+) {
+    companion object {
+        /**
+         * [fromFirestore] deserializes a document from the firestore database into a
+         * [ReminderState] object
+         */
+        fun fromFirestore(
+            title: String,
+            description: String,
+            dueTime: Map<String, Long>, // Firestore document field for localTime
+            dueDate: Map<String, Any>, // Firestore document field for localDate
+            isCompleted: Boolean
+        ): ReminderState {
+            val year = dueDate["year"] as Long
+            val month = dueDate["month"] as String
+            val day = dueDate["dayOfMonth"] as Long
+            val localDate = LocalDate.of(year.toInt(), month.toMonthNumber(), day.toInt())
+
+            val hour = dueTime["hour"] as Long
+            val minute = dueTime["minute"] as Long
+            val second = dueTime["second"] as Long
+            val nano = dueTime["nano"] as Long
+            val localTime = LocalTime.of(hour.toInt(), minute.toInt(), second.toInt(), nano.toInt())
+
+            return ReminderState(title, description, localTime, localDate, isCompleted)
+        }
+    }
+}
+
+/**
+ * Extension function to convert a month name to the equivalent month number
+ */
+private fun String.toMonthNumber(): Int {
+    return when(this) {
+        "JANUARY" -> 1
+        "FEBRUARY" -> 2
+        "MARCH" -> 3
+        "APRIL" -> 4
+        "MAY" -> 5
+        "JUNE" -> 6
+        "JULY" -> 7
+        "AUGUST" -> 8
+        "SEPTEMBER" -> 9
+        "OCTOBER" -> 10
+        "NOVEMBER" -> 11
+        "DECEMBER" -> 12
+        else -> 0
+    }
+}
+
 fun ReminderState.createTimeString(): String {
     return DateTimeFormatter.ofPattern("HH:mm").format(dueTime)
 }
