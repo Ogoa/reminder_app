@@ -1,5 +1,21 @@
 <resources>
     <string name="app_name">RemindMe</string>
 
+    <!-- Screen names -->
+    <string name="home_screen">Home</string>
+    <string name="create_reminder">New Reminder</string>
+
+    <string name="task_title">Title</string>
+    <string name="task_description">Description</string>
     <string name="complete_task">Completed</string>
+
+    <string name="date_saved">Date saved</string>
+    <string name="time_saved">Time saved</string>
+    <string name="ok_button">OK</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="pick_date_title">Pick a date</string>
+    <string name="time_picker_title">Pick a time</string>
+    <string name="date_button_label">Pick Date</string>
+    <string name="time_button_label">Pick Time</string>
+    <string name="save_button">Save</string>
 </resources>

@@ -79,8 +79,7 @@ fun RemindMeApp() {
         ) {
             // Define routes to different screens
             composable(route = RemindMeScreens.HomeScreen.name) {
-                /*TODO: Implement the Home Screen*/
-                SavedRemindersScreen()
+                SavedRemindersScreen(viewModel = newReminderViewModel)
             }
 
             composable(route = RemindMeScreens.Create.name) {
