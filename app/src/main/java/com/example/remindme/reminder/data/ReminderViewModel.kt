@@ -38,6 +38,12 @@ class NewReminderViewModel(application: Application): ViewModel() {
     var isSaving by mutableStateOf(false)
         private set
 
+    var isLoadingContent by mutableStateOf(false)
+        private set
+
+    var savedReminders: MutableList<ReminderState> by mutableStateOf(mutableListOf())
+        private set
+
     // Create a reminders collection
     private val remindersCollection = Firebase.firestore.collection("reminders")
 
@@ -73,6 +79,47 @@ class NewReminderViewModel(application: Application): ViewModel() {
                 Toast.LENGTH_LONG
             ).show()
             isSaving = false
+        }
+    }
+
+    /**
+     * Retrieves all saved reminders from the Firestore database
+     */
+    fun retrieveSavedReminders() = viewModelScope.launch(Dispatchers.IO) {
+        isLoadingContent = true
+        if(savedReminders.isNotEmpty()) {
+            savedReminders.clear()
+        }
+        remindersCollection.addSnapshotListener { querySnapshot, error ->
+            error?.let {
+                Toast.makeText(
+                    appContext,
+                    "${it.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                isLoadingContent = false
+            }
+            querySnapshot?.let { documents ->
+                try {
+                    for (document in documents) {
+                        val title = document.getString("title") ?: ""
+                        val description = document.getString("description") ?: ""
+                        @Suppress("UNCHECKED_CAST") val dueTime = document["dueTime"] as Map<String, Long>
+                        @Suppress("UNCHECKED_CAST") val dueDate = document["dueDate"] as Map<String, Long>
+                        val isCompleted = document.getBoolean("isCompleted") ?: false
+
+                        // Create a ReminderState object from the fields
+                        val savedReminder = ReminderState
+                            .fromFirestore(title, description, dueTime, dueDate, isCompleted)
+
+                        savedReminders.add(savedReminder)
+                    }
+                    Log.d(TAG, "Successfully retrieved data from Firestore")
+                    isLoadingContent = false
+                } catch(e: Exception) {
+                    Log.d(TAG, "${e.message}")
+                }
+            }
         }
     }
 
