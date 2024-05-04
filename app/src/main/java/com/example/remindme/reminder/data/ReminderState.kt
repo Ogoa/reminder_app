@@ -1,7 +1,10 @@
 package com.example.remindme.reminder.data
 
+import androidx.compose.ui.text.toLowerCase
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 /**
@@ -17,3 +20,21 @@ data class ReminderState(
     val dueDate: LocalDate = LocalDate.now(),
     val isCompleted: Boolean = false
 )
+fun ReminderState.createTimeString(): String {
+    return DateTimeFormatter.ofPattern("HH:mm").format(dueTime)
+}
+
+fun ReminderState.getRelativeDateString(): String {
+    val today = LocalDate.now()
+    val tomorrow = today.plusDays(1)
+    val nextMonth = today.plusWeeks(4)
+    val nextYear = LocalDate.now().plusYears(1)
+    return when {
+        dueDate == today -> "Today"
+        dueDate == tomorrow -> "Tomorrow"
+        dueDate >= nextYear || dueDate > nextMonth -> DateTimeFormatter
+            .ofPattern("E, d MMM yyyy", Locale.ENGLISH)
+            .format(dueDate)
+        else -> DateTimeFormatter.ofPattern("E, d MMM", Locale.ENGLISH).format(dueDate)
+    }
+}
